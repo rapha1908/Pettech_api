@@ -1,4 +1,6 @@
-export class User {
+import { IUser } from './models/user.interface'
+
+export class User implements IUser {
   username: string
   password: string
 

@@ -1,18 +1,18 @@
-import { Address } from '@/entities/address'
-import { Person } from '@/entities/person.entity'
+import { IAddress } from '@/entities/models/address.interface'
+import { IPerson } from '@/entities/models/person.interface'
 import { database } from '@/lib/pg/db'
 
 export class AddressRepository {
-  async create(address: Address): Promise<Address | undefined> {
-    const result = await database.clientInstance?.query<Address>(
+  async create({
+    street,
+    city,
+    state,
+    zip_code,
+    person_id,
+  }: IAddress): Promise<IAddress | undefined> {
+    const result = await database.clientInstance?.query<IAddress>(
       'INSERT INTO address (street, city, state, zip_code, person_id) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [
-        address.street,
-        address.city,
-        address.state,
-        address.zip_code,
-        address.person_id,
-      ],
+      [street, city, state, zip_code, person_id],
     )
     return result?.rows[0]
   }
@@ -21,7 +21,7 @@ export class AddressRepository {
     personId: number,
     page: number,
     limit: number,
-  ): Promise<(Address & Person)[]> {
+  ): Promise<(IAddress & IPerson)[]> {
     const offset = (page - 1) * limit
     const query = `
       SELECT address.*, person.* 
@@ -30,7 +30,7 @@ export class AddressRepository {
       WHERE person.id = $1
       LIMIT $2 OFFSET $3
     `
-    const result = await database.clientInstance?.query<Address & Person>(
+    const result = await database.clientInstance?.query<IAddress & IPerson>(
       query,
       [personId, limit, offset],
     )

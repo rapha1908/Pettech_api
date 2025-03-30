@@ -1,4 +1,6 @@
-export class Address {
+import { IAddress } from './models/address.interface'
+
+export class Address implements IAddress {
   id?: number
   street: string
   city: string
