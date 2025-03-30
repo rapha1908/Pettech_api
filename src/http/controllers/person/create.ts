@@ -15,20 +15,15 @@ export async function create(request: FastifyRequest, replay: FastifyReply) {
     request.body,
   )
 
-  try {
-    const createPersonUseCase = MakeCreatePersonUseCase()
+  const createPersonUseCase = MakeCreatePersonUseCase()
 
-    const person = await createPersonUseCase.handler({
-      cpf,
-      name,
-      birth,
-      email,
-      user_id,
-    })
+  const person = await createPersonUseCase.handler({
+    cpf,
+    name,
+    birth,
+    email,
+    user_id,
+  })
 
-    return replay.status(201).send(person)
-  } catch (error) {
-    console.error(error)
-    throw new Error('Internal server error')
-  }
+  return replay.status(201).send(person)
 }

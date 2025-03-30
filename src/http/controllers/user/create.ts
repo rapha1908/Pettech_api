@@ -10,14 +10,9 @@ export async function create(request: FastifyRequest, replay: FastifyReply) {
 
   const { username, password } = registerBodySchema.parse(request.body)
 
-  try {
-    const createUserUseCase = MakeCreateUserUseCase()
+  const createUserUseCase = MakeCreateUserUseCase()
 
-    const user = await createUserUseCase.handler({ username, password })
+  const user = await createUserUseCase.handler({ username, password })
 
-    return replay.status(201).send(user)
-  } catch (error) {
-    console.error(error)
-    throw new Error('Internal server error')
-  }
+  return replay.status(201).send(user)
 }

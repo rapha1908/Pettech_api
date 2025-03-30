@@ -8,14 +8,9 @@ export async function findUser(request: FastifyRequest, reply: FastifyReply) {
   })
   const { id } = registerParamsSchema.parse(request.params)
 
-  try {
-    const findWithPersonUseCase = MakeFindWithPerson()
+  const findWithPersonUseCase = MakeFindWithPerson()
 
-    const user = await findWithPersonUseCase.handler(id)
+  const user = await findWithPersonUseCase.handler(id)
 
-    return reply.status(200).send(user)
-  } catch (error) {
-    console.error(error)
-    throw new Error('Internal server error')
-  }
+  return reply.status(200).send(user)
 }
