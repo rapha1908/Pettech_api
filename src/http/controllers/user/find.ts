@@ -1,5 +1,4 @@
-import { UserRepository } from '@/repositories/user.repository'
-import { FindWithPersonUseCase } from '@/use-cases/find-with-person'
+import { MakeFindWithPerson } from '@/use-cases/factory/make-find-with-person'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
@@ -10,8 +9,7 @@ export async function findUser(request: FastifyRequest, reply: FastifyReply) {
   const { id } = registerParamsSchema.parse(request.params)
 
   try {
-    const userRepository = new UserRepository()
-    const findWithPersonUseCase = new FindWithPersonUseCase(userRepository)
+    const findWithPersonUseCase = MakeFindWithPerson()
 
     const user = await findWithPersonUseCase.handler(id)
 

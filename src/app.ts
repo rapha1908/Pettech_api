@@ -3,7 +3,6 @@ import { PersonRoutes } from '@/http/controllers/person/routes'
 import { UserRoutes } from '@/http/controllers/user/routes'
 import { ZodError } from 'zod'
 import { env } from 'process'
-import { error } from 'console'
 
 export const app = fastify()
 
