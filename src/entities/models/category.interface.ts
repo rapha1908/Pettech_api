@@ -1,5 +1,5 @@
 export interface ICategory {
   id?: number
   name: string
-  createdAt: Date
+  createdAt?: Date
 }
