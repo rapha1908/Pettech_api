@@ -11,9 +11,6 @@ import { Category } from './category.entity'
 
 @Entity({
   name: 'products',
-  orderBy: {
-    id: 'ASC',
-  },
 })
 export class Product implements IProduct {
   @PrimaryGeneratedColumn('uuid', {

@@ -2,10 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 import { ICategory } from './models/category.interface'
 
 @Entity({
-  name: 'categories',
-  orderBy: {
-    id: 'ASC',
-  },
+  name: 'category',
 })
 export class Category implements ICategory {
   @PrimaryGeneratedColumn('increment', {
