@@ -8,14 +8,14 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     description: z.string(),
     image_url: z.string(),
     price: z.coerce.number(),
-    categories: z.array(
-      z
-        .object({
+    categories: z
+      .array(
+        z.object({
           id: z.coerce.number(),
           name: z.string(),
-        })
-        .optional(),
-    ),
+        }),
+      )
+      .optional(),
   })
 
   const { name, price, image_url, description, categories } =
