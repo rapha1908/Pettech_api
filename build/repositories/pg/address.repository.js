@@ -17,12 +17,12 @@ var __copyProps = (to, from, except, desc) => {
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// src/http/controllers/person/create.ts
-var create_exports = {};
-__export(create_exports, {
-  create: () => create
+// src/repositories/pg/address.repository.ts
+var address_repository_exports = {};
+__export(address_repository_exports, {
+  AddressRepository: () => AddressRepository
 });
-module.exports = __toCommonJS(create_exports);
+module.exports = __toCommonJS(address_repository_exports);
 
 // src/lib/pg/db.ts
 var import_pg = require("pg");
@@ -72,58 +72,38 @@ var Database = class {
 };
 var database = new Database();
 
-// src/repositories/pg/person.repository.ts
-var PersonRepository = class {
-  async create(person) {
+// src/repositories/pg/address.repository.ts
+var AddressRepository = class {
+  async create({
+    street,
+    city,
+    state,
+    zip_code,
+    person_id
+  }) {
     const result = await database.clientInstance?.query(
-      "INSERT INTO person (cpf, name, birth, email, user_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [person.cpf, person.name, person.birth, person.email, person.user_id]
+      "INSERT INTO address (street, city, state, zip_code, person_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      [street, city, state, zip_code, person_id]
     );
     return result?.rows[0];
   }
-};
-
-// src/use-cases/create-person.ts
-var CreatePersonUseCase = class {
-  constructor(personRepository) {
-    this.personRepository = personRepository;
+  async findAddressByPersonId(personId, page, limit) {
+    const offset = (page - 1) * limit;
+    const query = `
+      SELECT address.*, person.* 
+      FROM address
+      JOIN person ON address.person_id = person.id
+      WHERE person.id = $1
+      LIMIT $2 OFFSET $3
+    `;
+    const result = await database.clientInstance?.query(
+      query,
+      [personId, limit, offset]
+    );
+    return result?.rows || [];
   }
-  handler(person) {
-    return this.personRepository.create(person);
-  }
 };
-
-// src/use-cases/factory/make-create-person-use-case.ts
-function MakeCreatePersonUseCase() {
-  const personRepository = new PersonRepository();
-  const createPersonUseCase = new CreatePersonUseCase(personRepository);
-  return createPersonUseCase;
-}
-
-// src/http/controllers/person/create.ts
-var import_zod2 = require("zod");
-async function create(request, replay) {
-  const registerBodySchema = import_zod2.z.object({
-    cpf: import_zod2.z.string(),
-    name: import_zod2.z.string(),
-    birth: import_zod2.z.coerce.date(),
-    email: import_zod2.z.string().email(),
-    user_id: import_zod2.z.coerce.number()
-  });
-  const { cpf, name, birth, email, user_id } = registerBodySchema.parse(
-    request.body
-  );
-  const createPersonUseCase = MakeCreatePersonUseCase();
-  const person = await createPersonUseCase.handler({
-    cpf,
-    name,
-    birth,
-    email,
-    user_id
-  });
-  return replay.status(201).send(person);
-}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  create
+  AddressRepository
 });

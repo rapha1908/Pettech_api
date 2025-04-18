@@ -17,30 +17,18 @@ var __copyProps = (to, from, except, desc) => {
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// src/env/index.ts
-var env_exports = {};
-__export(env_exports, {
-  env: () => env
+// src/use-cases/errors/resource-not-found-error.ts
+var resource_not_found_error_exports = {};
+__export(resource_not_found_error_exports, {
+  ResourceNotFoundError: () => ResourceNotFoundError
 });
-module.exports = __toCommonJS(env_exports);
-var import_config = require("dotenv/config");
-var import_zod = require("zod");
-var envScheme = import_zod.z.object({
-  NODE_ENV: import_zod.z.enum(["development", "production", "test"]).default("development"),
-  PORT: import_zod.z.coerce.number().default(3e3),
-  DATABASE_USER: import_zod.z.string(),
-  DATABASE_HOST: import_zod.z.string(),
-  DATABASE_NAME: import_zod.z.string(),
-  DATABASE_PASSWORD: import_zod.z.string(),
-  DATABASE_PORT: import_zod.z.coerce.number()
-});
-var _env = envScheme.safeParse(process.env);
-if (!_env.success) {
-  console.error("Invalid environment variables", _env.error.format());
-  throw new Error("Invalid environment variables");
-}
-var env = _env.data;
+module.exports = __toCommonJS(resource_not_found_error_exports);
+var ResourceNotFoundError = class extends Error {
+  constructor() {
+    super("Resource not found");
+  }
+};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  env
+  ResourceNotFoundError
 });

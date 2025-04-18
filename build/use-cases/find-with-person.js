@@ -17,30 +17,34 @@ var __copyProps = (to, from, except, desc) => {
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// src/env/index.ts
-var env_exports = {};
-__export(env_exports, {
-  env: () => env
+// src/use-cases/find-with-person.ts
+var find_with_person_exports = {};
+__export(find_with_person_exports, {
+  FindWithPersonUseCase: () => FindWithPersonUseCase
 });
-module.exports = __toCommonJS(env_exports);
-var import_config = require("dotenv/config");
-var import_zod = require("zod");
-var envScheme = import_zod.z.object({
-  NODE_ENV: import_zod.z.enum(["development", "production", "test"]).default("development"),
-  PORT: import_zod.z.coerce.number().default(3e3),
-  DATABASE_USER: import_zod.z.string(),
-  DATABASE_HOST: import_zod.z.string(),
-  DATABASE_NAME: import_zod.z.string(),
-  DATABASE_PASSWORD: import_zod.z.string(),
-  DATABASE_PORT: import_zod.z.coerce.number()
-});
-var _env = envScheme.safeParse(process.env);
-if (!_env.success) {
-  console.error("Invalid environment variables", _env.error.format());
-  throw new Error("Invalid environment variables");
-}
-var env = _env.data;
+module.exports = __toCommonJS(find_with_person_exports);
+
+// src/use-cases/errors/resource-not-found-error.ts
+var ResourceNotFoundError = class extends Error {
+  constructor() {
+    super("Resource not found");
+  }
+};
+
+// src/use-cases/find-with-person.ts
+var FindWithPersonUseCase = class {
+  constructor(userRepository) {
+    this.userRepository = userRepository;
+  }
+  async handler(userId) {
+    const user = await this.userRepository.findWithPerson(userId);
+    if (!user) {
+      throw new ResourceNotFoundError();
+    }
+    return user;
+  }
+};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  env
+  FindWithPersonUseCase
 });

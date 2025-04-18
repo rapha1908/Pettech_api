@@ -17,12 +17,12 @@ var __copyProps = (to, from, except, desc) => {
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// src/http/controllers/person/create.ts
-var create_exports = {};
-__export(create_exports, {
-  create: () => create
+// src/use-cases/factory/make-create-user-use-case.ts
+var make_create_user_use_case_exports = {};
+__export(make_create_user_use_case_exports, {
+  MakeCreateUserUseCase: () => MakeCreateUserUseCase
 });
-module.exports = __toCommonJS(create_exports);
+module.exports = __toCommonJS(make_create_user_use_case_exports);
 
 // src/lib/pg/db.ts
 var import_pg = require("pg");
@@ -72,58 +72,44 @@ var Database = class {
 };
 var database = new Database();
 
-// src/repositories/pg/person.repository.ts
-var PersonRepository = class {
-  async create(person) {
+// src/repositories/pg/user.repository.ts
+var UserRepository = class {
+  async create({ username, password }) {
     const result = await database.clientInstance?.query(
-      "INSERT INTO person (cpf, name, birth, email, user_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [person.cpf, person.name, person.birth, person.email, person.user_id]
+      'INSERT INTO "user" (username, password) VALUES ($1, $2) RETURNING *',
+      [username, password]
+    );
+    return result?.rows[0];
+  }
+  async findWithPerson(userId) {
+    const result = await database.clientInstance?.query(
+      `
+      SELECT * FROM "user"
+      LEFT JOIN person ON "user".id = person.user_id
+      WHERE "user".id = $1`,
+      [userId]
     );
     return result?.rows[0];
   }
 };
 
-// src/use-cases/create-person.ts
-var CreatePersonUseCase = class {
-  constructor(personRepository) {
-    this.personRepository = personRepository;
+// src/use-cases/create-user.ts
+var CreateUserUseCase = class {
+  constructor(userRepository) {
+    this.userRepository = userRepository;
   }
-  handler(person) {
-    return this.personRepository.create(person);
+  handler(user) {
+    return this.userRepository.create(user);
   }
 };
 
-// src/use-cases/factory/make-create-person-use-case.ts
-function MakeCreatePersonUseCase() {
-  const personRepository = new PersonRepository();
-  const createPersonUseCase = new CreatePersonUseCase(personRepository);
-  return createPersonUseCase;
-}
-
-// src/http/controllers/person/create.ts
-var import_zod2 = require("zod");
-async function create(request, replay) {
-  const registerBodySchema = import_zod2.z.object({
-    cpf: import_zod2.z.string(),
-    name: import_zod2.z.string(),
-    birth: import_zod2.z.coerce.date(),
-    email: import_zod2.z.string().email(),
-    user_id: import_zod2.z.coerce.number()
-  });
-  const { cpf, name, birth, email, user_id } = registerBodySchema.parse(
-    request.body
-  );
-  const createPersonUseCase = MakeCreatePersonUseCase();
-  const person = await createPersonUseCase.handler({
-    cpf,
-    name,
-    birth,
-    email,
-    user_id
-  });
-  return replay.status(201).send(person);
+// src/use-cases/factory/make-create-user-use-case.ts
+function MakeCreateUserUseCase() {
+  const userRepository = new UserRepository();
+  const createUserUseCase = new CreateUserUseCase(userRepository);
+  return createUserUseCase;
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  create
+  MakeCreateUserUseCase
 });

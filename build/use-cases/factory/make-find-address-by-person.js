@@ -17,12 +17,22 @@ var __copyProps = (to, from, except, desc) => {
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// src/http/controllers/person/create.ts
-var create_exports = {};
-__export(create_exports, {
-  create: () => create
+// src/use-cases/factory/make-find-address-by-person.ts
+var make_find_address_by_person_exports = {};
+__export(make_find_address_by_person_exports, {
+  MakeFindAddressByPerson: () => MakeFindAddressByPerson
 });
-module.exports = __toCommonJS(create_exports);
+module.exports = __toCommonJS(make_find_address_by_person_exports);
+
+// src/use-cases/find-address-by-person.ts
+var FindAddressByPersonPersonUseCase = class {
+  constructor(addressRepository) {
+    this.addressRepository = addressRepository;
+  }
+  async handler(personId, page, limit) {
+    return this.addressRepository.findAddressByPersonId(personId, page, limit);
+  }
+};
 
 // src/lib/pg/db.ts
 var import_pg = require("pg");
@@ -72,58 +82,47 @@ var Database = class {
 };
 var database = new Database();
 
-// src/repositories/pg/person.repository.ts
-var PersonRepository = class {
-  async create(person) {
+// src/repositories/pg/address.repository.ts
+var AddressRepository = class {
+  async create({
+    street,
+    city,
+    state,
+    zip_code,
+    person_id
+  }) {
     const result = await database.clientInstance?.query(
-      "INSERT INTO person (cpf, name, birth, email, user_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [person.cpf, person.name, person.birth, person.email, person.user_id]
+      "INSERT INTO address (street, city, state, zip_code, person_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      [street, city, state, zip_code, person_id]
     );
     return result?.rows[0];
   }
+  async findAddressByPersonId(personId, page, limit) {
+    const offset = (page - 1) * limit;
+    const query = `
+      SELECT address.*, person.* 
+      FROM address
+      JOIN person ON address.person_id = person.id
+      WHERE person.id = $1
+      LIMIT $2 OFFSET $3
+    `;
+    const result = await database.clientInstance?.query(
+      query,
+      [personId, limit, offset]
+    );
+    return result?.rows || [];
+  }
 };
 
-// src/use-cases/create-person.ts
-var CreatePersonUseCase = class {
-  constructor(personRepository) {
-    this.personRepository = personRepository;
-  }
-  handler(person) {
-    return this.personRepository.create(person);
-  }
-};
-
-// src/use-cases/factory/make-create-person-use-case.ts
-function MakeCreatePersonUseCase() {
-  const personRepository = new PersonRepository();
-  const createPersonUseCase = new CreatePersonUseCase(personRepository);
-  return createPersonUseCase;
-}
-
-// src/http/controllers/person/create.ts
-var import_zod2 = require("zod");
-async function create(request, replay) {
-  const registerBodySchema = import_zod2.z.object({
-    cpf: import_zod2.z.string(),
-    name: import_zod2.z.string(),
-    birth: import_zod2.z.coerce.date(),
-    email: import_zod2.z.string().email(),
-    user_id: import_zod2.z.coerce.number()
-  });
-  const { cpf, name, birth, email, user_id } = registerBodySchema.parse(
-    request.body
+// src/use-cases/factory/make-find-address-by-person.ts
+function MakeFindAddressByPerson() {
+  const addressRepository = new AddressRepository();
+  const findAddressByPersonUseCase = new FindAddressByPersonPersonUseCase(
+    addressRepository
   );
-  const createPersonUseCase = MakeCreatePersonUseCase();
-  const person = await createPersonUseCase.handler({
-    cpf,
-    name,
-    birth,
-    email,
-    user_id
-  });
-  return replay.status(201).send(person);
+  return findAddressByPersonUseCase;
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  create
+  MakeFindAddressByPerson
 });

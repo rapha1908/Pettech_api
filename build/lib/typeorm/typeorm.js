@@ -17,12 +17,15 @@ var __copyProps = (to, from, except, desc) => {
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// src/env/index.ts
-var env_exports = {};
-__export(env_exports, {
-  env: () => env
+// src/lib/typeorm/typeorm.ts
+var typeorm_exports = {};
+__export(typeorm_exports, {
+  appDataSource: () => appDataSource
 });
-module.exports = __toCommonJS(env_exports);
+module.exports = __toCommonJS(typeorm_exports);
+var import_typeorm = require("typeorm");
+
+// src/env/index.ts
 var import_config = require("dotenv/config");
 var import_zod = require("zod");
 var envScheme = import_zod.z.object({
@@ -40,7 +43,43 @@ if (!_env.success) {
   throw new Error("Invalid environment variables");
 }
 var env = _env.data;
+
+// src/lib/typeorm/migration/1744977784424-ProductAutoGenerateUUID.ts
+var ProductAutoGenerateUUID1744977784424 = class {
+  async up(queryRunner) {
+    await queryRunner.query(`
+        CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+    `);
+    await queryRunner.query(`
+        ALTER TABLE product
+        ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+    `);
+  }
+  async down(queryRunner) {
+    await queryRunner.query(`
+        ALTER TABLE product
+        ALTER COLUMN id DROP DEFAULT;`);
+  }
+};
+
+// src/lib/typeorm/typeorm.ts
+var appDataSource = new import_typeorm.DataSource({
+  type: "postgres",
+  host: env.DATABASE_HOST,
+  port: env.DATABASE_PORT,
+  username: env.DATABASE_USER,
+  password: env.DATABASE_PASSWORD,
+  database: env.DATABASE_NAME,
+  entities: ["src/entities/*.ts"],
+  migrations: [ProductAutoGenerateUUID1744977784424],
+  logging: env.NODE_ENV === "development"
+});
+appDataSource.initialize().then(() => {
+  console.log("Database connection established");
+}).catch((error) => {
+  console.error("Error connecting to the database:", error);
+});
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  env
+  appDataSource
 });
