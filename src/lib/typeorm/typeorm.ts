@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm'
 
-import { env } from '@/env'
+import { env } from '../../env'
 import { ProductAutoGenerateUUID1744977784424 } from './migration/1744977784424-ProductAutoGenerateUUID'
 
 export const appDataSource = new DataSource({

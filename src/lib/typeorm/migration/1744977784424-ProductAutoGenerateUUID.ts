@@ -5,18 +5,21 @@ export class ProductAutoGenerateUUID1744977784424
 {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-        CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+      CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
     `)
 
-    await queryRunner.query(`
-        ALTER TABLE product
-        ALTER COLUMN id SET DEFAULT uuid_generate_v4();
-    `)
+    await queryRunner.query(
+      `ALTER TABLE product
+       ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+      `,
+    )
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`
-        ALTER TABLE product
-        ALTER COLUMN id DROP DEFAULT;`)
+    await queryRunner.query(
+      `ALTER TABLE product
+       ALTER COLUMN id DROP DEFAULT;
+      `,
+    )
   }
 }
