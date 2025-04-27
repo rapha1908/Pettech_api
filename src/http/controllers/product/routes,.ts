@@ -7,8 +7,8 @@ import { deleteProduct } from './delete'
 
 export async function productRoutes(app: FastifyInstance) {
   app.get('/product', findAllProducts)
-  app.get('/product:id', findProduct)
+  app.get('/product/:id', findProduct)
   app.post('/product', create)
-  app.put('/product', update)
-  app.delete('/product:id', deleteProduct)
+  app.put('/product/:id', update)
+  app.delete('/product/:id', deleteProduct)
 }
