@@ -6,11 +6,11 @@ export async function findProduct(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const findProductParamsSchema = z.object({
+  const registerParamsSchema = z.object({
     id: z.coerce.string(),
   })
 
-  const { id } = findProductParamsSchema.parse(request.params)
+  const { id } = registerParamsSchema.parse(request.params)
 
   const findProductUseCase = makeFindProductUseCase()
 

@@ -13,7 +13,7 @@ export class ProductRepository implements IProductRepository {
 
   async findAll(page: number, limit: number): Promise<IProduct[]> {
     return this.repository.find({
-      relations: ['category'],
+      relations: ['categories'],
       skip: (page - 1) * limit,
       take: limit,
     })
@@ -21,7 +21,7 @@ export class ProductRepository implements IProductRepository {
 
   async findById(id: string): Promise<IProduct | null> {
     return this.repository.findOne({
-      relations: ['category'],
+      relations: ['categories'],
       where: { id },
     })
   }
