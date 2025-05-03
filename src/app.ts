@@ -9,11 +9,12 @@ import { productRoutes } from './http/controllers/product/routes,'
 import { categoryRoutes } from './http/controllers/category/routes'
 import fastifyJwt from '@fastify/jwt'
 import { validateJwt } from './http/middlewares/jwt-validate'
+import { env } from './env'
 
 export const app = fastify()
 
 app.register(fastifyJwt, {
-  secret: 'env.JWT_SECRET',
+  secret: env.JWT_SECRET,
   sign: { expiresIn: '10m' },
 })
 
