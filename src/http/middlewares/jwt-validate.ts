@@ -6,13 +6,11 @@ export async function validateJwt(
 ) {
   try {
     // rota + método que não exigem autenticação
-    const route = request.url
-    const method = request.method
+    const routeFreeList = ['POST-/user/signin', 'POST-/user']
+    const validateRoute = `${request.method}-${request.url}`
 
     // Se for criação de usuário, não valida JWT
-    if (route === '/user' && method === 'POST') {
-      return
-    }
+    if (routeFreeList.includes(validateRoute)) return
 
     // em todas as outras rotas, verifica o token
     await request.jwtVerify()
