@@ -6,7 +6,7 @@ export async function validateJwt(
 ) {
   try {
     // rota + método que não exigem autenticação
-    const route = request.routerPath
+    const route = request.url
     const method = request.method
 
     // Se for criação de usuário, não valida JWT
