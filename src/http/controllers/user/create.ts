@@ -1,5 +1,5 @@
 import { MakeCreateUserUseCase } from '@/use-cases/factory/make-create-user-use-case'
-import { hash } from 'crypto'
+import { hash } from 'bcryptjs'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
@@ -19,5 +19,5 @@ export async function create(request: FastifyRequest, replay: FastifyReply) {
 
   const user = await createUserUseCase.handler(userWithHashedPassword)
 
-  return replay.status(201).send(user)
+  return replay.status(201).send({ id: user?.id, username: user?.username })
 }
