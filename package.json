@@ -13,6 +13,7 @@
     "license": "ISC",
     "description": "API para aprender usar o NodeJs",
     "devDependencies": {
+        "@types/bcryptjs": "3.0.0",
         "@types/node": "22.13.11",
         "@types/pg": "8.11.11",
         "@typescript-eslint/eslint-plugin": "6.21.0",
@@ -31,6 +32,8 @@
         "typescript": "5.8.2"
     },
     "dependencies": {
+        "@fastify/jwt": "9.1.0",
+        "bcryptjs": "3.0.2",
         "dotenv": "16.4.7",
         "fastify": "5.2.1",
         "pg": "8.14.1",
