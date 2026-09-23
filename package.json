@@ -32,13 +32,13 @@
         "typescript": "5.8.2"
     },
     "dependencies": {
-        "@fastify/jwt": "9.1.0",
+        "@fastify/jwt": "10.2.2",
         "bcryptjs": "3.0.2",
         "dotenv": "16.4.7",
-        "fastify": "5.2.1",
+        "fastify": "5.12.5",
         "pg": "8.14.1",
         "reflect-metadata": "0.2.2",
-        "typeorm": "0.3.21",
+        "typeorm": "0.3.31",
         "zod": "3.24.2"
     }
 }

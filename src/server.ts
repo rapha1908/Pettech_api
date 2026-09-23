@@ -6,5 +6,5 @@ app
     port: env.PORT,
   })
   .then(() => {
-    console.log('servidor rodando em localhost:3000')
+    console.log(`servidor rodando em localhost:${env.PORT}`)
   })
