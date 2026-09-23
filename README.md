@@ -1,123 +1,123 @@
 # Pettech API
 
-API REST para um pet shop, desenvolvida para praticar Node.js com TypeScript. Gerencia usuários, pessoas, endereços, categorias e produtos, com autenticação via JWT.
+A REST API for a pet shop, built to practice Node.js with TypeScript. It manages users, people, addresses, categories and products, with JWT authentication.
 
-## Tecnologias
+## Tech Stack
 
 - **Node.js** + **TypeScript**
-- **Fastify** — servidor HTTP
-- **PostgreSQL** — acessado com o driver `pg` (SQL puro) e com **TypeORM**
-- **Zod** — validação de variáveis de ambiente e dos dados das requisições
-- **@fastify/jwt** + **bcryptjs** — autenticação e hash de senhas
-- **ESLint** + **Prettier** — padronização de código
+- **Fastify** — HTTP server
+- **PostgreSQL** — accessed with the `pg` driver (raw SQL) and with **TypeORM**
+- **Zod** — validation of environment variables and request data
+- **@fastify/jwt** + **bcryptjs** — authentication and password hashing
+- **ESLint** + **Prettier** — code style
 
-## Arquitetura
+## Architecture
 
-O projeto segue uma separação em camadas:
+The project follows a layered structure:
 
 ```
 src/
 ├── http/
-│   ├── controllers/   # rotas e validação da entrada (Zod)
-│   └── middlewares/   # validação do JWT
-├── use-cases/         # regras de negócio
-│   ├── factory/       # montam cada use case com seu repositório
-│   └── errors/        # erros de domínio
-├── repositories/      # interfaces de acesso a dados
-│   ├── pg/            # implementações com SQL puro (user, person, address)
-│   └── typeorm/       # implementações com TypeORM (product, category)
-├── entities/          # entidades e interfaces do domínio
-├── lib/               # conexões com o banco (pg e TypeORM) e migrations
-└── env/               # leitura e validação das variáveis de ambiente
+│   ├── controllers/   # routes and input validation (Zod)
+│   └── middlewares/   # JWT validation
+├── use-cases/         # business rules
+│   ├── factory/       # build each use case with its repository
+│   └── errors/        # domain errors
+├── repositories/      # data access interfaces
+│   ├── pg/            # raw SQL implementations (user, person, address)
+│   └── typeorm/       # TypeORM implementations (product, category)
+├── entities/          # domain entities and interfaces
+├── lib/               # database connections (pg and TypeORM) and migrations
+└── env/               # environment variable loading and validation
 ```
 
-Os controllers dependem apenas das interfaces dos repositórios, então trocar a forma de acesso ao banco não afeta as regras de negócio.
+Controllers depend only on the repository interfaces, so changing how the database is accessed does not affect the business rules.
 
-## Como rodar
+## Getting Started
 
-### Pré-requisitos
+### Prerequisites
 
 - Node.js 20+
 - PostgreSQL
 
-### Passos
+### Steps
 
 ```bash
-# 1. Instale as dependências
+# 1. Install dependencies
 npm install
 
-# 2. Crie o arquivo de variáveis de ambiente e preencha os valores
+# 2. Create the environment file and fill in the values
 cp .env.example .env
 
-# 3. Rode as migrations
+# 3. Run the migrations
 npm run migrate
 
-# 4. Inicie o servidor em modo de desenvolvimento
+# 4. Start the server in development mode
 npm run start:dev
 ```
 
-O servidor sobe em `http://localhost:3000` (ou na porta definida em `PORT`).
+The server runs at `http://localhost:3000` (or on the port set in `PORT`).
 
-> As tabelas `user`, `person` e `address` são acessadas via SQL puro e precisam existir no banco antes de usar essas rotas.
+> The `user`, `person` and `address` tables are accessed via raw SQL and must exist in the database before using those routes.
 
-### Variáveis de ambiente
+### Environment Variables
 
-| Variável            | Descrição                                        |
-| ------------------- | ------------------------------------------------ |
-| `PORT`              | Porta do servidor (padrão: `3000`)               |
-| `NODE_ENV`          | `development`, `production` ou `test` (padrão: `development`) |
-| `DATABASE_HOST`     | Host do PostgreSQL                               |
-| `DATABASE_PORT`     | Porta do PostgreSQL                              |
-| `DATABASE_USER`     | Usuário do banco                                 |
-| `DATABASE_PASSWORD` | Senha do banco                                   |
-| `DATABASE_NAME`     | Nome do banco                                    |
-| `JWT_SECRET`        | Chave usada para assinar os tokens JWT           |
+| Variable            | Description                                                    |
+| ------------------- | -------------------------------------------------------------- |
+| `PORT`              | Server port (default: `3000`)                                  |
+| `NODE_ENV`          | `development`, `production` or `test` (default: `development`) |
+| `DATABASE_HOST`     | PostgreSQL host                                                |
+| `DATABASE_PORT`     | PostgreSQL port                                                |
+| `DATABASE_USER`     | Database user                                                  |
+| `DATABASE_PASSWORD` | Database password                                              |
+| `DATABASE_NAME`     | Database name                                                  |
+| `JWT_SECRET`        | Key used to sign JWT tokens                                    |
 
-Se alguma variável obrigatória estiver faltando ou inválida, o servidor não inicia.
+If any required variable is missing or invalid, the server will not start.
 
 ### Scripts
 
-| Comando             | Descrição                                   |
+| Command             | Description                                 |
 | ------------------- | ------------------------------------------- |
-| `npm run start:dev` | Servidor em modo desenvolvimento (watch)    |
-| `npm run build`     | Gera o build em `build/`                    |
-| `npm start`         | Roda o build de produção                    |
-| `npm run migrate`   | Executa as migrations do TypeORM            |
+| `npm run start:dev` | Development server (watch mode)             |
+| `npm run build`     | Builds the project into `build/`            |
+| `npm start`         | Runs the production build                   |
+| `npm run migrate`   | Runs the TypeORM migrations                 |
 
-## Autenticação
+## Authentication
 
-Todas as rotas exigem um token JWT, exceto o cadastro de usuário e o login.
+All routes require a JWT token, except user registration and sign-in.
 
-1. Crie um usuário com `POST /user`
-2. Faça login com `POST /user/signin` para receber o token
-3. Envie o token nas demais requisições:
+1. Create a user with `POST /user`
+2. Sign in with `POST /user/signin` to get the token
+3. Send the token in all other requests:
 
 ```
 Authorization: Bearer <token>
 ```
 
-O token expira em 10 minutos.
+The token expires after 10 minutes.
 
-## Rotas
+## Routes
 
-### Usuário
+### User
 
-| Método | Rota           | Autenticação | Descrição                         |
-| ------ | -------------- | :----------: | --------------------------------- |
-| POST   | `/user`        |      —       | Cria um usuário                   |
-| POST   | `/user/signin` |      —       | Faz login e retorna o token       |
-| GET    | `/user/:id`    |      ✔       | Busca um usuário e seus dados de pessoa |
+| Method | Route          | Auth | Description                              |
+| ------ | -------------- | :--: | ---------------------------------------- |
+| POST   | `/user`        |  —   | Creates a user                           |
+| POST   | `/user/signin` |  —   | Signs in and returns the token           |
+| GET    | `/user/:id`    |  ✔   | Gets a user and their person data        |
 
 ```json
-// POST /user  e  POST /user/signin
-{ "username": "joao", "password": "minhasenha" }
+// POST /user  and  POST /user/signin
+{ "username": "joao", "password": "mypassword" }
 ```
 
-### Pessoa
+### Person
 
-| Método | Rota      | Autenticação | Descrição        |
-| ------ | --------- | :----------: | ---------------- |
-| POST   | `/person` |      ✔       | Cria uma pessoa  |
+| Method | Route     | Auth | Description       |
+| ------ | --------- | :--: | ----------------- |
+| POST   | `/person` |  ✔   | Creates a person  |
 
 ```json
 {
@@ -129,12 +129,12 @@ O token expira em 10 minutos.
 }
 ```
 
-### Endereço
+### Address
 
-| Método | Rota                                         | Autenticação | Descrição                             |
-| ------ | -------------------------------------------- | :----------: | ------------------------------------- |
-| POST   | `/address`                                   |      ✔       | Cria um endereço                      |
-| GET    | `/address/person/:personId?page=1&limit=10`  |      ✔       | Lista os endereços de uma pessoa      |
+| Method | Route                                        | Auth | Description                         |
+| ------ | -------------------------------------------- | :--: | ----------------------------------- |
+| POST   | `/address`                                   |  ✔   | Creates an address                  |
+| GET    | `/address/person/:personId?page=1&limit=10`  |  ✔   | Lists a person's addresses          |
 
 ```json
 {
@@ -146,37 +146,37 @@ O token expira em 10 minutos.
 }
 ```
 
-### Categoria
+### Category
 
-| Método | Rota        | Autenticação | Descrição          |
-| ------ | ----------- | :----------: | ------------------ |
-| POST   | `/category` |      ✔       | Cria uma categoria |
+| Method | Route       | Auth | Description         |
+| ------ | ----------- | :--: | ------------------- |
+| POST   | `/category` |  ✔   | Creates a category  |
 
 ```json
-{ "name": "Rações" }
+{ "name": "Pet Food" }
 ```
 
-### Produto
+### Product
 
-| Método | Rota                          | Autenticação | Descrição                     |
-| ------ | ----------------------------- | :----------: | ----------------------------- |
-| GET    | `/product?page=1&limit=10`    |      ✔       | Lista produtos (paginado)     |
-| GET    | `/product/:id`                |      ✔       | Busca um produto              |
-| POST   | `/product`                    |      ✔       | Cria um produto               |
-| PUT    | `/product/:id`                |      ✔       | Atualiza um produto           |
-| DELETE | `/product/:id`                |      ✔       | Remove um produto             |
+| Method | Route                         | Auth | Description                   |
+| ------ | ----------------------------- | :--: | ----------------------------- |
+| GET    | `/product?page=1&limit=10`    |  ✔   | Lists products (paginated)    |
+| GET    | `/product/:id`                |  ✔   | Gets a product                |
+| POST   | `/product`                    |  ✔   | Creates a product             |
+| PUT    | `/product/:id`                |  ✔   | Updates a product             |
+| DELETE | `/product/:id`                |  ✔   | Deletes a product             |
 
 ```json
-// POST /product  e  PUT /product/:id
+// POST /product  and  PUT /product/:id
 {
-  "name": "Ração Premium 10kg",
-  "description": "Ração para cães adultos",
-  "image_url": "https://exemplo.com/racao.jpg",
+  "name": "Premium Dog Food 10kg",
+  "description": "Food for adult dogs",
+  "image_url": "https://example.com/dog-food.jpg",
   "price": 189.9,
-  "categories": [{ "id": 1, "name": "Rações" }]
+  "categories": [{ "id": 1, "name": "Pet Food" }]
 }
 ```
 
-## Autor
+## Author
 
 Raphael De Santi
